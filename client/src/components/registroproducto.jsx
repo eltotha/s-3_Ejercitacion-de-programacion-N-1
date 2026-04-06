@@ -1,7 +1,7 @@
 function RegistroProducto({ onRegistroExitoso }) {
   return (
     <div>
-      <p>Registro exitoso?</p>
+      <p>El boton de registro funciona</p>
     </div>
   );
 }

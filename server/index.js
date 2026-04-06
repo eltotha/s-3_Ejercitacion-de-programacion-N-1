@@ -8,7 +8,7 @@ const PORT = 3001;
 const db = mysql.createConnection({
   host: "localhost",
   user: "root",
-  password: "query_sql", // Cambia por la contraseña de tu base de datos
+  password: "123qwe", // Cambia por la contraseña de tu base de datos
   port: "3306", // Cambia según tu configuración
   database: "empresasublimacion_bordados", // Asegúrate de que este sea el nombre correcto
 });
