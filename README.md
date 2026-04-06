@@ -9,3 +9,18 @@ Ejecuta el siguiente comando para crear el archivo `package.json`:
 
 ```bash
 npm init -y
+```
+
+### 2. Descargar express en caso de no tenerlo
+Ejecuta el siguente comando:
+
+```bash
+npm install express
+```
+
+### 3. ejecutar el server
+Ejecuta el siguente comando:
+
+```bash
+node index.js
+```
