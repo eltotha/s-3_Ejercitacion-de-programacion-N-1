@@ -257,3 +257,11 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 -- Dump completed on 2025-03-19 14:15:48
+
+
+INSERT INTO Registrarproducto 
+(codigo_producto, nombre_producto, cantidad, tipo_compra, precio_unitario, precio_total, color, dimensiones)
+VALUES
+('P001', 'Taza sublimada', 50, 'unidad', 120.00, 6000.00, 'Blanco', '10x8 cm'),
+('P002', 'Camisa bordada', 30, 'unidad', 250.00, 7500.00, 'Azul', 'M'),
+('P003', 'Gorra bordada', 40, 'unidad', 150.00, 6000.00, 'Negro', 'Ajustable');
