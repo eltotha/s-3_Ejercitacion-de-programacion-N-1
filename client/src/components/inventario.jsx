@@ -19,7 +19,7 @@ import {
 
 import SearchIcon from "@mui/icons-material/Search";
 import AddBoxIcon from "@mui/icons-material/AddBox";
-import RegistroProducto from "./RegistroProducto";
+import RegistroProducto from "./registroproducto";
 import "../style/inventario.css";
 
 const Inventario = () => {

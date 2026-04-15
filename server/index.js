@@ -214,6 +214,7 @@ app.post("/api/registrar-producto", (req, res) => {
       codigo_producto || null,
       nombre_producto,
       cantidadEnUnidades, // Guardamos en unidades tipo_compra,
+      tipo_compra,
       precio_unitario,
       precio_total,
       proveedor || null,
