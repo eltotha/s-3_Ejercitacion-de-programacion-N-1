@@ -177,36 +177,62 @@ const Inventario = () => {
                 <TableCell sx={{ fontWeight: "bold", bgcolor: "#ecf0f1" }}>
                   Dimensiones
                 </TableCell>
+                <TableCell sx={{ fontWeight: "bold", bgcolor: "#ecf0f1" }}>
+                  Imagen
+                </TableCell>
               </TableRow>
             </TableHead>
 
             <TableBody>
-              {productos.map((producto) => (
-                <TableRow
-                  key={producto.id}
-                  hover
-                  sx={{
-                    "&:last-child td, &:last-child th": { border: 0 },
-                    "&:hover": { bgcolor: "#f2f6fc" },
-                  }}
-                >
-                  <TableCell>{producto.codigo_producto}</TableCell>
-                  <TableCell sx={{ maxWidth: 300 }}>
-                    {producto.nombre_producto}
-                  </TableCell>
-                  <TableCell>{producto.cantidad}</TableCell>
-                  <TableCell>{producto.tipo_compra}</TableCell>
-                  <TableCell>
-                    ${parseFloat(producto.precio_unitario).toFixed(2)}
-                  </TableCell>
-                  <TableCell>
-                    ${parseFloat(producto.precio_total).toFixed(2)}
-                  </TableCell>
-                  <TableCell>{producto.proveedor}</TableCell>
-                  <TableCell>{producto.color}</TableCell>
-                  <TableCell>{producto.dimensiones}</TableCell>
-                </TableRow>
-              ))}
+              {productos.map((producto) => {
+                const rutaImagen = producto.nombre_imagen
+                  ? `http://localhost:3001/uploads/${producto.nombre_imagen}`
+                  : null;
+
+                return (
+                  <TableRow
+                    key={producto.id}
+                    hover
+                    sx={{
+                      "&:last-child td, &:last-child th": { border: 0 },
+                      "&:hover": { bgcolor: "#f2f6fc" },
+                    }}
+                  >
+                    <TableCell>{producto.codigo_producto}</TableCell>
+                    <TableCell sx={{ maxWidth: 300 }}>
+                      {producto.nombre_producto}
+                    </TableCell>
+                    <TableCell>{producto.cantidad}</TableCell>
+                    <TableCell>{producto.tipo_compra}</TableCell>
+                    <TableCell>
+                      ${parseFloat(producto.precio_unitario).toFixed(2)}
+                    </TableCell>
+                    <TableCell>
+                      ${parseFloat(producto.precio_total).toFixed(2)}
+                    </TableCell>
+                    <TableCell>{producto.proveedor}</TableCell>
+                    <TableCell>{producto.color}</TableCell>
+                    <TableCell>{producto.dimensiones}</TableCell>
+                    <TableCell sx={{ maxWidth: 120 }}>
+                      {rutaImagen ? (
+                        <img
+                          src={rutaImagen}
+                          alt={producto.nombre_producto}
+                          style={{
+                            maxWidth: 100,
+                            maxHeight: 80,
+                            objectFit: "cover",
+                            borderRadius: 8,
+                            border: "1px solid #dcdde1",
+                          }}
+                        />
+                      ) : (
+                        "Sin imagen"
+                      )}
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
         </TableContainer>

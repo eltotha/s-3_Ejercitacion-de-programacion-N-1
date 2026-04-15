@@ -1,6 +1,7 @@
 const express = require("express");
 const mysql = require("mysql2");
 const cors = require("cors");
+const path = require("path");
 const app = express();
 const PORT = 3001;
 
@@ -21,11 +22,47 @@ db.connect((err) => {
   }
   
   console.log("Conexión exitosa a la base de datos");
+
+  const sqlCheckColumn = `
+    SELECT COLUMN_NAME
+    FROM INFORMATION_SCHEMA.COLUMNS
+    WHERE TABLE_SCHEMA = ?
+      AND TABLE_NAME = ?
+      AND COLUMN_NAME = ?
+  `;
+
+  db.query(
+    sqlCheckColumn,
+    ["empresasublimacion_bordados", "Registrarproducto", "nombre_imagen"],
+    (checkErr, results) => {
+      if (checkErr) {
+        console.error("Error al verificar columna nombre_imagen:", checkErr);
+        return;
+      }
+
+      if (results.length === 0) {
+        db.query(
+          "ALTER TABLE Registrarproducto ADD COLUMN nombre_imagen VARCHAR(255) NULL",
+          (alterErr) => {
+            if (alterErr) {
+              console.error("Error al crear columna nombre_imagen:", alterErr);
+            } else {
+              console.log("Columna nombre_imagen creada en Registrarproducto");
+            }
+          }
+        );
+      } else {
+        console.log("Columna nombre_imagen verificada en Registrarproducto");
+      }
+    }
+  );
 });
 
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Ruta para el inicio de sesión 
 app.post("/api/login", (req, res) => {
@@ -171,28 +208,52 @@ app.post("/api/registrar-factura", (req, res) => {
 
 //REGISTRAR PRODUCTO
 app.post("/api/registrar-producto", (req, res) => {
+  console.log("[POST /api/registrar-producto] body:", req.body);
+
   const {
     codigo_producto,
     nombre_producto,
     cantidad,
-
     tipo_compra,
     precio_unitario,
     proveedor,
     color,
     dimensiones,
+    nombre_imagen,
     fecha_Registrarproducto,
   } = req.body;
 
-  if (!nombre_producto || !cantidad || !tipo_compra || !precio_unitario) {
+  const nombreImagen = nombre_imagen
+    ? path.basename(String(nombre_imagen))
+    : null;
+
+  if (!nombre_producto || cantidad == null || !tipo_compra || precio_unitario == null) {
     return res.status(400).json({ error: "Faltan campos obligatorios" });
   }
 
-  // Convertir a unidades aquí
-  const cantidadEnUnidades =
-    tipo_compra === "docena" ? cantidad * 12 : cantidad;
+  const cantidadInt = parseInt(cantidad, 10);
+  const precioUnitarioFloat = parseFloat(precio_unitario);
 
-  const precio_total = precio_unitario * cantidadEnUnidades;
+  if (
+    Number.isNaN(cantidadInt) ||
+    cantidadInt <= 0 ||
+    Number.isNaN(precioUnitarioFloat) ||
+    precioUnitarioFloat <= 0
+  ) {
+    return res.status(400).json({ error: "Cantidad o precio unitario inválidos" });
+  }
+
+  if (!["unidad", "docena"].includes(tipo_compra)) {
+    return res.status(400).json({ error: "Tipo de compra inválido" });
+  }
+
+  // Convertir a unidades para calcular el precio total
+  const cantidadEnUnidades =
+    tipo_compra === "docena" ? cantidadInt * 12 : cantidadInt;
+
+  const precio_total = parseFloat(
+    (precioUnitarioFloat * cantidadEnUnidades).toFixed(2)
+  );
 
   const fecha_registro =
     fecha_Registrarproducto ||
@@ -204,8 +265,8 @@ app.post("/api/registrar-producto", (req, res) => {
       cantidad, tipo_compra,
       precio_unitario, precio_total, proveedor,
       fecha_Registrarproducto, color,
-      dimensiones
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      dimensiones, nombre_imagen
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
   db.query(
@@ -213,21 +274,23 @@ app.post("/api/registrar-producto", (req, res) => {
     [
       codigo_producto || null,
       nombre_producto,
-      cantidadEnUnidades, // Guardamos en unidades tipo_compra,
+      cantidadInt,
       tipo_compra,
-      precio_unitario,
+      precioUnitarioFloat,
       precio_total,
       proveedor || null,
       fecha_registro,
       color || null,
       dimensiones || null,
+      nombreImagen || null,
     ],
     (err, result) => {
       if (err) {
         console.error("Error al insertar el producto:", err);
-        return res
-          .status(500)
-          .json({ error: "Error al registrar el producto" });
+        return res.status(500).json({
+          error: "Error al registrar el producto",
+          details: err.message,
+        });
       }
       res.status(201).json({
         message: "Producto registrado exitosamente",

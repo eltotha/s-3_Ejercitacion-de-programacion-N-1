@@ -10,10 +10,11 @@ import {
   Alert,
 } from "@mui/material";
 import axios from "axios";
+import { v4 as uuidv4 } from "uuid";
 
 const RegistroProducto = ({ onRegistroExitoso }) => {
   const [form, setForm] = useState({
-    codigo_producto: "",
+    codigo_producto: uuidv4(),
     nombre_producto: "",
     cantidad: "",
     tipo_compra: "unidad",
@@ -23,13 +24,18 @@ const RegistroProducto = ({ onRegistroExitoso }) => {
     dimensiones: "",
     fecha_Registrarproducto: "",
   });
-
+  const [imageFile, setImageFile] = useState(null);
   const [mensaje, setMensaje] = useState("");
   const [error, setError] = useState("");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm({ ...form, [name]: value });
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files && e.target.files[0];
+    setImageFile(file || null);
   };
 
   const handleSubmit = async (e) => {
@@ -54,9 +60,16 @@ const RegistroProducto = ({ onRegistroExitoso }) => {
       const res = await axios.post(
         "http://localhost:3001/api/registrar-producto",
         {
-          ...form,
+          codigo_producto: form.codigo_producto || "",
+          nombre_producto: form.nombre_producto || "",
           cantidad,
+          tipo_compra: form.tipo_compra || "unidad",
           precio_unitario: precioUnitario,
+          proveedor: form.proveedor || "",
+          color: form.color || "",
+          dimensiones: form.dimensiones || "",
+          fecha_Registrarproducto: form.fecha_Registrarproducto || "",
+          nombre_imagen: imageFile ? imageFile.name : null,
         }
       );
 
@@ -75,6 +88,7 @@ const RegistroProducto = ({ onRegistroExitoso }) => {
         dimensiones: "",
         fecha_Registrarproducto: "",
       });
+      setImageFile(null);
 
       // Actualizar tabla
       if (onRegistroExitoso) onRegistroExitoso();
@@ -118,7 +132,7 @@ const RegistroProducto = ({ onRegistroExitoso }) => {
               label="Código"
               name="codigo_producto"
               value={form.codigo_producto}
-              onChange={handleChange}
+              disabled
             />
           </Grid>
 
@@ -205,13 +219,31 @@ const RegistroProducto = ({ onRegistroExitoso }) => {
             />
           </Grid>
 
-          <Grid item xs={12}>
+          <Grid item xs={12} md={6}>
+            <Button
+              variant="outlined"
+              component="label"
+              fullWidth
+              sx={{ height: "100%", textTransform: "none" }}
+            >
+              {imageFile ? "Imagen seleccionada: " + imageFile.name : "Seleccionar imagen"}
+              <input
+                type="file"
+                name="nombre_imagen"
+                accept="image/*"
+                hidden
+                onChange={handleFileChange}
+              />
+            </Button>
+          </Grid>
+
+          <Grid item xs={12} md={6}>
             <TextField
               fullWidth
               type="datetime-local"
               label="Fecha"
               name="fecha_Registrarproducto"
-              slotProps={{ inputLabel: { shrink: true },}}
+              slotProps={{ inputLabel: { shrink: true } }}
               value={form.fecha_Registrarproducto}
               onChange={handleChange}
             />

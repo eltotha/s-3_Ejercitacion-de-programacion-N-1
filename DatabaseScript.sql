@@ -1,3 +1,4 @@
+drop database if exists empresasublimacion_bordados;
 CREATE DATABASE IF NOT EXISTS empresasublimacion_bordados;
 USE empresasublimacion_bordados;
 -- Tabla de usuarios para el inicio de sesión
@@ -25,8 +26,12 @@ precio_total DECIMAL(10,2) NOT NULL,
 proveedor VARCHAR(100),
 fecha_Registrarproducto DATETIME DEFAULT CURRENT_TIMESTAMP,
 color VARCHAR(50),
-dimensiones VARCHAR(50)
+dimensiones VARCHAR(50),
+nombre_imagen varchar(50)
 );
+
+desc Registrarproducto;
+
 -- Tabla de facturas
 CREATE TABLE IF NOT EXISTS facturas (
 id INT AUTO_INCREMENT PRIMARY KEY,
@@ -257,7 +262,6 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 -- Dump completed on 2025-03-19 14:15:48
-
 
 INSERT INTO Registrarproducto 
 (codigo_producto, nombre_producto, cantidad, tipo_compra, precio_unitario, precio_total, color, dimensiones)
